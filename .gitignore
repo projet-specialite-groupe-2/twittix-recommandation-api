@@ -20,9 +20,7 @@ dist/
 venv/
 .venv/
 env/
-.venv/
 .env
-.venv/
 
 # ------------------------------
 # PyCharm / IntelliJ IDEA

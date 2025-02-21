@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify
 
 from recommendation import Recommandation
@@ -28,4 +30,9 @@ def create_app():
 
 if __name__ == '__main__':
     twittix_recommandation_api_app = create_app()
-    twittix_recommandation_api_app.run(host='0.0.0.0', port=5000, debug=False)
+
+    host = os.getenv('APP_HOST', '0.0.0.0')
+    port = int(os.getenv('APP_PORT', 5000))
+
+    twittix_recommandation_api_app.run(host=host, port=port)
+

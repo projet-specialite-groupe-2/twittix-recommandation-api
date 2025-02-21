@@ -1,20 +1,48 @@
+import os
+from typing import Optional
+
 import psycopg2
 import psycopg2.extras
 from psycopg2.pool import SimpleConnectionPool
 
-HOST = "localhost"
-PORT = "5432"
-USER = "admin"
-PASSWORD = "admin"
-DB_EXISTING = "lebigprojet"
-DB_TARGET = "twittix"
+HOST = os.getenv("DB_HOST", "localhost")
+PORT = os.getenv("DB_PORT", "5432")
+USER = os.getenv("DB_USER", "admin")
+PASSWORD = os.getenv("DB_PASSWORD", "admin")
+DB_EXISTING = os.getenv("DB_EXISTING", "lebigprojet")
+DB_TARGET = os.getenv("DB_TARGET", "twittix")
 
-pool = SimpleConnectionPool(minconn=1, maxconn=5,
-                            user=USER,
-                            password=PASSWORD,
-                            host=HOST,
-                            port=PORT,
-                            database=DB_TARGET)
+
+class DBConnectionManager:
+    def __init__(self):
+        self.pool = SimpleConnectionPool(
+            minconn=1,
+            maxconn=5,
+            user=USER,
+            password=PASSWORD,
+            host=HOST,
+            port=PORT,
+            database=DB_TARGET
+        )
+
+    def get_conn(self):
+        return self.pool.getconn()
+
+    def release_conn(self, conn):
+        self.pool.putconn(conn)
+
+
+db_manager: Optional[DBConnectionManager] = None
+
+
+def init_db_manager():
+    """
+    Initializes the global DB connection manager.
+    """
+
+    global db_manager
+    if db_manager is None:
+        db_manager = DBConnectionManager()
 
 
 def get_db_connection():
@@ -22,7 +50,10 @@ def get_db_connection():
     Returns a connection from the connection pool.
     :return:  A psycopg2 connection object.
     """
-    return pool.getconn()
+
+    if db_manager is None:
+        init_db_manager()
+    return db_manager.get_conn()
 
 
 def release_db_connection(conn):
@@ -30,7 +61,10 @@ def release_db_connection(conn):
     Releases a connection back to the connection pool.
     :param conn: psycopg2 connection object.
     """
-    pool.putconn(conn)
+
+    if db_manager is None:
+        raise RuntimeError("DB manager is not initialized.")
+    db_manager.release_conn(conn)
 
 
 def get_follows(user_id):
