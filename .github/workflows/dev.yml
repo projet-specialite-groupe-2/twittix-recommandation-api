@@ -22,9 +22,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y  
           
-    #   - name: Ensure Docker network exists
-    #     run: |
-    #       docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix     
+      - name: Ensure Docker network exists
+        run: |
+          docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix     
 
       - name: Build Docker Compose services
         run: docker-compose build  
@@ -50,3 +50,6 @@ jobs:
 #           REMOTE_HOST: ${{ secrets.DEV_SERVER_IP }}
 #           REMOTE_USER: ${{ secrets.DEV_HOST }}
 #           TARGET: ./dev/recommandation-api/
+            # SCRIPT_AFTER: |
+            #     docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
+            #     docker-compose up -d --build
