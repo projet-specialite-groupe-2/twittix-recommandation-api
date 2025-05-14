@@ -34,8 +34,9 @@ jobs:
 
       - name: Run Docker Compose services
         run: |
-            docker exec -it recommendation_api sh && \
-            python -m unittest tests.RecommandationTest
+            docker compose exec recommendation_api sh -c "
+                python -m unittest tests.RecommandationTest
+            "
 
 #   deploy:
 #     runs-on: ubuntu-latest
