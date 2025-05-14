@@ -34,23 +34,23 @@ jobs:
 
       - name: Run Docker Compose services
         run: |
-            docker compose exec recommendation_api sh -c "
+            # docker compose exec recommendation_api sh -c "
                 python -m unittest tests.RecommandationTest
             "
 
-#   deploy:
-#     runs-on: ubuntu-latest
-#     needs: test
-#     steps:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
 
-#       - name: Deploy via SSH
-#         uses: easingthemes/ssh-deploy@v5.1.0
-#         with:
-#           # Paramètres pour la connexion SSH
-#           SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_KEY }}
-#           REMOTE_HOST: ${{ secrets.DEV_SERVER_IP }}
-#           REMOTE_USER: ${{ secrets.DEV_HOST }}
-#           TARGET: ./dev/recommandation-api/
-            # SCRIPT_AFTER: |
-            #     docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
-            #     docker-compose up -d --build
+      - name: Deploy via SSH
+        uses: easingthemes/ssh-deploy@v5.1.0
+        with:
+          # Paramètres pour la connexion SSH
+          SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.DEV_SERVER_IP }}
+          REMOTE_USER: ${{ secrets.DEV_HOST }}
+          TARGET: ./dev/recommandation-api/
+          SCRIPT_AFTER: |
+            docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
+            docker-compose up -d --build
