@@ -52,4 +52,4 @@ jobs:
           TARGET: ./dev/recommandation-api/
           SCRIPT_AFTER: |
             docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
-            docker-compose up -d --build
+            docker compose up -d --build
