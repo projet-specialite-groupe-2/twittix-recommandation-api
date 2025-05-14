@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from recommendation import Recommandation
 from recommendation.sql import SqlManager
@@ -11,7 +11,9 @@ def create_app():
 
     @app.route('/recommendation/<int:user_id>', methods=['GET'])
     def get_recommandation_for_user(user_id):
-        recommandation_posts_ids_ordered = list(Recommandation.get_recommandation(user_id, 30))
+        n_posts: int = request.args.get("n", default=30, type=int)
+
+        recommandation_posts_ids_ordered = list(Recommandation.get_recommandation(user_id, n_posts))
 
         recommandation_posts = SqlManager.get_posts_by_id_list(recommandation_posts_ids_ordered)
         recommandation_posts_dict = {post["id"]: post for post in recommandation_posts}
