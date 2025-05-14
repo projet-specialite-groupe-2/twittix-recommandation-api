@@ -32,12 +32,11 @@ jobs:
       - name: Run Docker Compose services
         run: docker-compose up -d
 
-      - name: Run Docker Compose services
+      - name: Run Python Unit Tests
         run: |
-            # docker compose exec recommendation_api sh -c "
-                python -m unittest tests.RecommandationTest
+            docker compose exec recommendation_api sh -c "
+              python -m unittest tests.RecommandationTest
             "
-
   deploy:
     runs-on: ubuntu-latest
     needs: test
