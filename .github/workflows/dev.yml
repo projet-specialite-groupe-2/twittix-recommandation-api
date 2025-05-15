@@ -50,5 +50,6 @@ jobs:
           REMOTE_USER: ${{ secrets.DEV_HOST }}
           TARGET: ./dev/recommandation-api/
           SCRIPT_AFTER: |
+            cd ./dev/recommandation-api/
             docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
             docker compose up -d
