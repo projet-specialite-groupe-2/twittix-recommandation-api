@@ -21,3 +21,16 @@ services:
 networks:
   net-twittix:
     external: true
+
+# services:
+#   recommendation_api:
+#     image: docker.io/twittix/recommandation-api:latest
+#     networks:
+#       - net-twittix
+#     ports:
+#       - "8000:8000"
+#     # autres options…
+
+# networks:
+#   net-twittix:
+#     external: true
