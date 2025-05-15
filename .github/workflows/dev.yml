@@ -1,54 +1,3 @@
-
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v3
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v2
-
-#       - name: Set up Docker Compose
-#         run: |
-#           sudo apt-get update
-#           sudo apt-get install docker-compose -y  
-          
-#       - name: Ensure Docker network exists
-#         run: |
-#           docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix     
-
-#       - name: Build Docker Compose services
-#         run: docker-compose build  
-
-#       - name: Run Docker Compose services
-#         run: docker-compose up -d
-
-#       - name: Run Python Unit Tests
-#         run: |
-#             docker compose exec recommendation_api sh -c "
-#               python -m unittest tests.RecommandationTest
-#             "
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   steps:
-
-  #     - name: Deploy via SSH
-  #       uses: easingthemes/ssh-deploy@v5.1.0
-  #       with:
-  #         # Paramètres pour la connexion SSH
-  #         SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_KEY }}
-  #         REMOTE_HOST: ${{ secrets.DEV_SERVER_IP }}
-  #         REMOTE_USER: ${{ secrets.DEV_HOST }}
-  #         TARGET: ./dev/recommandation-api/
-  #         SCRIPT_AFTER: |
-  #           docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
-  #           docker compose up -d --build
-
-
 name: CI/CD Twittix Recommendation API
 
 on:
@@ -80,10 +29,7 @@ jobs:
           docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix     
         
       - name: Run Docker Compose services
-        run: |
-          export CR_PAT=${{ secrets.PAC_GITHUB }}
-          echo CR_PAT | docker login ghcr.io -u Giraph --password-stdin
-          docker-compose up -d
+        run: docker-compose up -d
         
       - name: Run Python Unit Tests
         run: |
@@ -118,8 +64,6 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
             cd ./dev/recommandation-api/
-            export CR_PAT=${{ secrets.PAC_GITHUB }}
-            echo CR_PAT | docker login ghcr.io -u Giraph --password-stdin
             docker compose pull
             docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
             docker compose up -d
