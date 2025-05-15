@@ -79,11 +79,11 @@ jobs:
         run: |
           docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix     
         
-      - name: Build Docker Compose services
-        run: docker-compose build  
-        
       - name: Run Docker Compose services
-        run: docker-compose up -d
+        run: |
+          export CR_PAT=${{ secrets.PAC_GITHUB }}
+          echo CR_PAT | docker login ghcr.io -u Giraph --password-stdin
+          docker-compose up -d
         
       - name: Run Python Unit Tests
         run: |
@@ -110,7 +110,6 @@ jobs:
     needs: build-and-push
 
     steps:
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
