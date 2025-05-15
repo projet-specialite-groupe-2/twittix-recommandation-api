@@ -2,10 +2,10 @@ version: "3.9"
 
 services:
   recommendation_api:
-    build: .
+    image: ghcr.io/projet-specialite-groupe-2/twittix-recommandation-api:latest 
     container_name: recommendation_api
     ports:
-      - "8081:8081"
+      - "8081:8081" 
     environment:
       APP_HOST: 0.0.0.0
       APP_PORT: 8081
@@ -21,16 +21,3 @@ services:
 networks:
   net-twittix:
     external: true
-
-# services:
-#   recommendation_api:
-#     image: docker.io/twittix/recommandation-api:latest
-#     networks:
-#       - net-twittix
-#     ports:
-#       - "8000:8000"
-#     # autres options…
-
-# networks:
-#   net-twittix:
-#     external: true
