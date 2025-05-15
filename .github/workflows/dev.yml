@@ -103,5 +103,5 @@ jobs:
           TARGET: ./dev/recommandation-api/
           SCRIPT_AFTER: |
             docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
-            # docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            # docker compose up -d
+            docker pull ghcr.io/projet-specialite-groupe-2/twittix-recommandation-api:latest
+            docker compose up -d
