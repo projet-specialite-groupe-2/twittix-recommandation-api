@@ -1,9 +1,9 @@
 services:
   recommendation_api:
-    image: ghcr.io/projet-specialite-groupe-2/twittix-recommandation-api:latest 
+    build: .
     container_name: recommendation_api
     ports:
-      - "8081:8081" 
+      - "8081:8081"
     environment:
       APP_HOST: 0.0.0.0
       APP_PORT: 8081
