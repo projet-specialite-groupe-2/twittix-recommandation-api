@@ -109,7 +109,7 @@ jobs:
           REMOTE_USER: ${{ secrets.DEV_HOST }}
           TARGET: ./dev/recommandation-api/
           SCRIPT_AFTER: |
-            cd /dev/recommandation-api
+            cd ./dev/recommandation-api/
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
             docker pull ghcr.io/projet-specialite-groupe-2/twittix-recommandation-api:latest
