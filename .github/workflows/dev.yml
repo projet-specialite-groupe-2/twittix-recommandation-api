@@ -110,7 +110,8 @@ jobs:
           TARGET: ./dev/recommandation-api/
           SCRIPT_AFTER: |
             cd ./dev/recommandation-api/
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
+            export CR_PAT=${{ secrets.PAC_GITHUB }}
+            echo CR_PAT | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker pull ghcr.io/projet-specialite-groupe-2/twittix-recommandation-api:latest
+            docker network inspect net-twittix >/dev/null 2>&1 || docker network create net-twittix
             docker compose up -d
