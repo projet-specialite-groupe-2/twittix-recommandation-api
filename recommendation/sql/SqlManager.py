@@ -80,9 +80,9 @@ def get_follows(user_id):
         with connection.cursor() as cur:
             cur.execute(
                 """
-                SELECT followed_user_id
-                FROM follows
-                WHERE following_user_id = %s
+                SELECT followed_id
+                FROM follow
+                WHERE follower_id = %s
                 """,
                 (user_id,)
             )
@@ -107,12 +107,12 @@ def get_friends(user_id):
         with connection.cursor() as cur:
             cur.execute(
                 """
-                SELECT f1.followed_user_id
-                FROM follows f1
-                JOIN follows f2
-                  ON f1.followed_user_id = f2.following_user_id
-                 AND f1.following_user_id = f2.followed_user_id
-                WHERE f1.following_user_id = %s
+                SELECT f1.followed_id
+                FROM follow f1
+                JOIN follow f2
+                  ON f1.followed_id = f2.follower_id
+                 AND f1.follower_id = f2.followed_id
+                WHERE f1.follower_id = %s
                 """,
                 (user_id,)
             )
@@ -141,13 +141,13 @@ def get_unseen_24h_posts_id_from_author_ids(user_id, author_ids):
             placeholders = ','.join(['%s'] * len(author_ids))
             query = f"""
                 SELECT p.id
-                FROM posts p
-                WHERE p.user_id IN ({placeholders})
+                FROM twit p
+                WHERE p.author_id IN ({placeholders})
                   AND p.created_at > (NOW() - INTERVAL '24 HOURS')
                   AND p.id NOT IN (
-                    SELECT post
-                    FROM post_view_status
-                    WHERE "user" = %s
+                    SELECT twit_id
+                    FROM user_twit
+                    WHERE "user_id" = %s
                   )
                 ORDER BY p.created_at DESC
             """
@@ -173,14 +173,14 @@ def get_unseen_top_posts_id_last_hour(user_id, limit=10):
     try:
         with connection.cursor() as cur:
             query = """
-                SELECT p.id, COUNT(l.liked_post_id) AS nb_likes
-                FROM posts p
-                LEFT JOIN likes l ON p.id = l.liked_post_id
+                SELECT p.id, COUNT(l.twit_id) AS nb_likes
+                from twit  p
+                LEFT JOIN \"like\" l ON p.id = l.twit_id
                 WHERE p.created_at > (NOW() - INTERVAL '1 HOUR')
                   AND p.id NOT IN (
-                    SELECT post
-                    FROM post_view_status
-                    WHERE "user" = %s
+                    SELECT twit_id
+                    FROM user_twit
+                    WHERE user_id = %s
                   )
                 GROUP BY p.id
                 ORDER BY nb_likes DESC
@@ -196,7 +196,7 @@ def get_unseen_top_posts_id_last_hour(user_id, limit=10):
 
 def get_unseen_top_posts_id_last_day_without_last_hour(user_id, limit=10):
     """
-    Retrieves the IDs of the most popular posts (based on likes) published between 1 and 24 hours ago,
+    Retrieves the IDs of the most popular posts (based on like) published between 1 and 24 hours ago,
     excluding posts the specified user has already viewed.
 
     :param user_id: ID of the user for whom we want to filter out viewed posts.
@@ -208,15 +208,15 @@ def get_unseen_top_posts_id_last_day_without_last_hour(user_id, limit=10):
     try:
         with connection.cursor() as cur:
             query = """
-                SELECT p.id, COUNT(l.liked_post_id) AS nb_likes
-                FROM posts p
-                LEFT JOIN likes l ON p.id = l.liked_post_id
+                SELECT p.id, COUNT(l.twit_id) AS nb_likes
+                from twit  p
+                LEFT JOIN \"like\" l ON p.id = l.twit_id
                 WHERE p.created_at > (NOW() - INTERVAL '24 HOURS')
                   AND p.created_at < (NOW() - INTERVAL '1 HOUR')
                   AND p.id NOT IN (
-                    SELECT post
-                    FROM post_view_status
-                    WHERE "user" = %s
+                    SELECT twit_id
+                    FROM user_twit
+                    WHERE user_id = %s
                   )
                 GROUP BY p.id
                 ORDER BY nb_likes DESC
@@ -245,11 +245,11 @@ def get_unseen_newest_posts_id(user_id, limit=100):
         with connection.cursor() as cur:
             query = """
                 SELECT p.id
-                FROM posts p
+                from twit  p
                 WHERE p.id NOT IN (
-                    SELECT post
-                    FROM post_view_status
-                    WHERE "user" = %s
+                    SELECT twit_id
+                    FROM user_twit
+                    WHERE user_id = %s
                 )
                 ORDER BY p.created_at DESC
                 LIMIT %s

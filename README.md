@@ -5,4 +5,3 @@
 | **GET** | `/recommendation/{user_id}` | `user_id` (int, requis) | `n` (int, optionnel, défaut : 30) | Liste JSON des ID des posts recommandés | `200 OK` |
 
 
-
