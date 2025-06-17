@@ -1,0 +1,12 @@
+steps:
+  # Étape 1 : Build de l'image Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/recommendation-api', '.']
+
+  # Étape 2 : Push de l'image sur Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/recommendation-api']
+
+
+images:
+  - 'gcr.io/$PROJECT_ID/recommendation-api'
