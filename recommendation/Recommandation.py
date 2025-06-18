@@ -100,14 +100,21 @@ def get_recommandation(user_id, nbr_posts_to_fetch, specific_random=random.Rando
     )
 
     if len(recommended_ids) < nbr_posts_to_fetch:
-        newest_posts_id = SqlManager.get_unseen_newest_posts_id(user_id, nbr_posts_to_fetch)
+        newest_unseen_posts_id = SqlManager.get_unseen_newest_posts_id(user_id, nbr_posts_to_fetch)
         to_add_index = 0
-        while len(recommended_ids) < nbr_posts_to_fetch and to_add_index < len(newest_posts_id):
-            post = newest_posts_id[to_add_index]
+        while len(recommended_ids) < nbr_posts_to_fetch and to_add_index < len(newest_unseen_posts_id):
+            post = newest_unseen_posts_id[to_add_index]
             post_id = post[0]
             if post_id not in recommended_ids:
                 recommended_ids.append(post_id)
             to_add_index += 1
+
+    if len(recommended_ids) < nbr_posts_to_fetch:
+        newest_posts_id = SqlManager.get_latest_post_ids_excluding(nbr_posts_to_fetch - len(recommended_ids),
+                                                                   recommended_ids)
+        for post in newest_posts_id:
+            post_id = post[0]
+            recommended_ids.append(post_id)
 
     return recommended_ids
 

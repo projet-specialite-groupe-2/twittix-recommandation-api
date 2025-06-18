@@ -149,6 +149,7 @@ def get_unseen_24h_posts_id_from_author_ids(user_id, author_ids):
                     FROM user_twit
                     WHERE "user_id" = %s
                   )
+                  AND parent IS NULL
                 ORDER BY p.created_at DESC
             """
             cur.execute(query, author_ids + [user_id])
@@ -182,6 +183,7 @@ def get_unseen_top_posts_id_last_hour(user_id, limit=10):
                     FROM user_twit
                     WHERE user_id = %s
                   )
+                  AND parent IS NULL
                 GROUP BY p.id
                 ORDER BY nb_likes DESC
                 LIMIT %s
@@ -218,6 +220,7 @@ def get_unseen_top_posts_id_last_day_without_last_hour(user_id, limit=10):
                     FROM user_twit
                     WHERE user_id = %s
                   )
+                  AND parent IS NULL
                 GROUP BY p.id
                 ORDER BY nb_likes DESC
                 LIMIT %s
@@ -251,10 +254,43 @@ def get_unseen_newest_posts_id(user_id, limit=100):
                     FROM user_twit
                     WHERE user_id = %s
                 )
+                  AND parent IS NULL
                 ORDER BY p.created_at DESC
                 LIMIT %s
             """
             cur.execute(query, (user_id, limit))
+            rows = cur.fetchall()
+    finally:
+        release_db_connection(connection)
+
+    return rows
+
+
+def get_latest_post_ids_excluding(limit, list_post_id_not_to_include):
+    """
+    Selects the IDs of the most recently created posts, excluding those in the provided list.
+
+    :param limit: Maximum number of post IDs to return.
+    :param list_post_id_not_to_include: List of post IDs to exclude from the results.
+    :return: A list of (post_id,) tuples for unseen posts.
+    """
+
+    if not list_post_id_not_to_include:
+        list_post_id_not_to_include = [-1]
+
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cur:
+            placeholders = ','.join(['%s'] * len(list_post_id_not_to_include))
+            query = f"""
+                SELECT p.id
+                FROM twit p
+                WHERE p.id NOT IN ({placeholders})
+                  AND parent IS NULL
+                ORDER BY p.created_at DESC
+                LIMIT %s
+            """
+            cur.execute(query, list_post_id_not_to_include + [limit])
             rows = cur.fetchall()
     finally:
         release_db_connection(connection)
